@@ -15,7 +15,7 @@ def sieve(n):
 
 def primes_from_n_to_m(n, m):
     initial_primes = sieve(int(m ** 0.5) + 1)
-    flags = numpy.ones(n, dtype=bool)
+    flags = numpy.ones(m - n, dtype=bool)
     flags[0] = flags[1] = False
     for prime in initial_primes:
         start = prime - n % prime
