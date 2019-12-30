@@ -1,0 +1,6 @@
+Flask
+flask_sslify
+Flask-Cors
+requests
+boto3
+numpy
