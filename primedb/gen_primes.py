@@ -17,20 +17,31 @@ def sieve(n):
 def primes_from_n_to_m(n, m, initial_primes=None):
     if n < 2:
         return sieve(m)
+
+    # We only need primes up to the root of our max number
+    root_max = int(m ** 0.5)
     if initial_primes is None:
-        initial_primes = sieve(int(m ** 0.5) + 1)
+        initial_primes = sieve(root_max + 1)
+    elif len(initial_primes) < root_max:
+        raise Exception("initial_primes list not long enough, {} of {}".format(len(initial_primes), root_max + 1))
+
     flags = numpy.ones(m - n, dtype=bool)
+
     for prime in initial_primes:
-        if prime > int(m ** 0.5):
+        if prime > root_max:
             break
+
         # Get the first index for a number that is divisible by the prime
         start = n % prime
         if start > 0:
             start = prime - n % prime
+
         # We don't want to mark the prime itself as False, just multiples
         if start + n <= prime:
             start = start + prime
+
         flags[start::prime] = False
+
     return numpy.flatnonzero(flags) + n
 
 
@@ -86,6 +97,21 @@ def write_nth_primes_to_s3(max_prime, bucket_size):
 def write_list_to_s3(iterable, separator, bucket, key):
     data_string = separator.join(str(i) for i in iterable)
     s3.client.put_object(Bucket=bucket, Key=key, Body=data_string.encode('utf-8'))
+
+
+def generate_prime_bucket_counts(bin_size, bucket_size, start, end):
+    initial_primes = sieve(int(end ** 0.5) + 1)
+    n = start
+    m = start + bucket_size
+    prime_counts = []
+
+    while m < end:
+        bucket_primes = primes_from_n_to_m(n, m, initial_primes)
+        count = len(bucket_primes)
+        print(n, m, count)
+        prime_counts.append(count)
+        n = m + 1
+        m = m + bucket_size
 
 
 if __name__ == '__main__':
