@@ -1,4 +1,5 @@
 import numpy
+import math
 from primedb.services.s3_controller import S3Controller
 
 s3 = S3Controller()
@@ -13,14 +14,43 @@ def sieve(n):
     return numpy.flatnonzero(flags)
 
 
-def primes_from_n_to_m(n, m):
-    initial_primes = sieve(int(m ** 0.5) + 1)
+def primes_from_n_to_m(n, m, initial_primes=None):
+    if n < 2:
+        return sieve(m)
+    if initial_primes is None:
+        initial_primes = sieve(int(m ** 0.5) + 1)
     flags = numpy.ones(m - n, dtype=bool)
-    flags[0] = flags[1] = False
     for prime in initial_primes:
-        start = prime - n % prime
+        if prime > int(m ** 0.5):
+            break
+        # Get the first index for a number that is divisible by the prime
+        start = n % prime
+        if start > 0:
+            start = prime - n % prime
+        # We don't want to mark the prime itself as False, just multiples
+        if start + n <= prime:
+            start = start + prime
         flags[start::prime] = False
     return numpy.flatnonzero(flags) + n
+
+
+def nth_prime_upper_bound(n):
+    # https://stackoverflow.com/a/25440642/2233321
+    fn = n
+    primes_small = [0, 2, 3, 5, 7, 11]
+    if n < 6:
+        return primes_small[n]
+    flog_n = math.log(n)
+    flog2n = math.log(flog_n)
+    if n >= 688383:
+        upper = fn * (flog_n + flog2n - 1.0 + ((flog2n - 2.00) / flog_n))
+    elif n >= 178974:
+        upper = fn * (flog_n + flog2n - 1.0 + ((flog2n - 1.95) / flog_n))
+    elif n >= 39017:
+        upper = fn * (flog_n + flog2n - 0.9484)
+    else:
+        upper = fn * (flog_n + 0.6000 * flog2n)
+    return int(math.ceil(upper))
 
 
 def write_primes_to_s3(max_prime, bucket_size):
