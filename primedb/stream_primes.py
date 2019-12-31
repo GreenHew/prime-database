@@ -1,5 +1,8 @@
 import numpy
 import time
+from primedb.services.s3_controller import S3Controller
+
+s3 = S3Controller()
 
 
 def sieve(n):
@@ -85,14 +88,31 @@ def generate_prime_bucket_counts(bucket_size, start, end):
         count = 0
         for prime in stream_primes_from_n_to_m(n, m, 10 ** 7):
             count += 1
-        print(n, m, count)
+        # print(n, m, count)
         prime_counts.append(count)
         n = m + 1
         m = m + bucket_size
     return prime_counts
 
+def generate_prime_bucket_bins(bin_size, bucket_size, start, end):
+    cur_n = start
+    cur_m = start + bin_size
+    while cur_m < end:
+        yield cur_n, cur_m, generate_prime_bucket_counts(bucket_size, cur_n, cur_m)
+        cur_n = cur_m + 1
+        cur_m = cur_n + bin_size
+
+def write_bins_to_s3(bin_size_sci, bucket_size, start, end, s3_bucket_name):
+    bin_size = int(float(bin_size_sci))
+    bins = generate_prime_bucket_bins(bin_size, bucket_size, start, end)
+    for cur_n, cur_m, bin in bins:
+        key_name = 'prime_counts/{}/{}.txt'.format(bin_size_sci, int(cur_m / bin_size))
+        s3.write_list_to_s3(bin, s3_bucket_name, key_name)
+        print(key_name, bin)
+
 
 if __name__ == '__main__':
     # print_occasional_primes()
-    counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
-    print(counts)
+    # counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
+    # print(counts)
+    write_bins_to_s3('1e6', 10**4, 0, 10**7, 'primedatabase')
