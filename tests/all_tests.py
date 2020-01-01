@@ -67,6 +67,9 @@ class TestPrimeGeneration(unittest.TestCase):
         # Test that we get 99,991 as the 2657th prime from 70,000 to 100,000
         self.assertEqual(primes[2656], 99991)
 
+    def test_generate_prime_bucket_bins(self):
+        primes = [p for p in stream_primes.stream_primes_from_n_to_m(1000, 100)]
+
 
 if __name__ == '__main__':
     unittest.main()

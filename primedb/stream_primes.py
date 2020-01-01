@@ -109,6 +109,7 @@ def write_bins_to_s3(bin_size_sci, bucket_size_sci, start, end, s3_bucket_name):
     bins = generate_prime_bucket_bins(bin_size, bucket_size, start, end)
     for cur_n, cur_m, bin in bins:
         key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, int(cur_m / bin_size))
+        print(key_name)
         s3.write_list_to_s3(bin, s3_bucket_name, key_name)
 
 def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name):
@@ -117,6 +118,7 @@ def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name
     keys.sort(key=lambda k: int(k.split('/')[-1].split('.')[0]))
     sum_total_below = 0
     for key in keys:
+        print(key)
         obj = s3.client.get_object(Bucket=s3_bucket_name, Key=key)
         total = obj['Metadata']['total']
         total_below = obj['Metadata'].get('total_below')
