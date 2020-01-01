@@ -81,25 +81,26 @@ def print_occasional_primes():
 
 def generate_prime_bucket_counts(bucket_size, start, end):
     n = start
-    m = start + bucket_size - 1
+    m = start + bucket_size
     prime_counts = []
 
-    while m < end:
+    while m <= end:
         count = 0
+        primes = []
         for prime in stream_primes_from_n_to_m(n, m, 10 ** 7):
+            primes.append(prime)
             count += 1
-        # print(n, m, count)
         prime_counts.append(count)
-        n = m + 1
+        n = m
         m = m + bucket_size
     return prime_counts
 
 def generate_prime_bucket_bins(bin_size, bucket_size, start, end):
     cur_n = start
     cur_m = start + bin_size
-    while cur_m < end:
+    while cur_m <= end:
         yield cur_n, cur_m, generate_prime_bucket_counts(bucket_size, cur_n, cur_m)
-        cur_n = cur_m + 1
+        cur_n = cur_m
         cur_m = cur_n + bin_size
 
 def write_bins_to_s3(bin_size_sci, bucket_size_sci, start, end, s3_bucket_name):
@@ -109,7 +110,6 @@ def write_bins_to_s3(bin_size_sci, bucket_size_sci, start, end, s3_bucket_name):
     for cur_n, cur_m, bin in bins:
         key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, int(cur_m / bin_size))
         s3.write_list_to_s3(bin, s3_bucket_name, key_name)
-        print(key_name, bin)
 
 def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name):
     prefix = 'prime_counts/{}/{}'.format(bin_size_sci, bucket_size_sci)
@@ -127,12 +127,11 @@ def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name
                 'total_below': str(sum_total_below)
             }, CopySource=kwargs, MetadataDirective='REPLACE')
         sum_total_below += int(total)
-        print(total, key)
 
 
 if __name__ == '__main__':
     # print_occasional_primes()
     # counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
     # print(counts)
-    # write_bins_to_s3('1e6', '1e4', 0, 10**8, 'primedatabase')
+    write_bins_to_s3('1e6', '1e4', 0, 1e7, 'primedatabase')
     update_total_below_s3_metadata('1e6', '1e4', 'primedatabase')

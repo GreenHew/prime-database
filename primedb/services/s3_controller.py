@@ -13,9 +13,6 @@ class S3Controller:
 
     def load_bin_from_s3(self, bucket, key):
         obj = self.client.get_object(Bucket=bucket, Key=key)
-        # print(vars(obj))
-        # obj.get()['Body'].read().decode('utf-8')
-        print(obj)
         total = int(obj['Metadata']['total'])
         total_below = int(obj['Metadata'].get('total_below', -1))
         body = obj['Body'].read().decode('utf-8')

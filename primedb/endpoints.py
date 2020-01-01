@@ -18,13 +18,21 @@ def get_nth_prime(n, bucket_size=1000):
     return prime
 
 
-def get_nth_prime_from_bin(n, bucket_size=10 ** 7):
-    upper_bound = nth_prime_upper_bound(n)
-    cur_n = 0
-    lower_bound = 1
-    key_name = 'prime_counts/{}/{}.txt'.format(bin_size_sci, int(cur_m / bin_size))
-    for prime_count in example_bin:
-        if cur_n + prime_count > n:
+def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
+    bucket_size = int(float(bucket_size_sci))
+    bin_size = int(float(bin_size_sci))
+    upper_bound = nth_prime_upper_bound(n) + 1
+    bin_count = upper_bound // bin_size + 1
+    key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
+    total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    while n > total_below + total:
+        bin_count += 1
+        key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
+        total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    cur_n = total_below
+    lower_bound = bin_size * bin_count - bin_size
+    for prime_count in counts:
+        if cur_n + prime_count >= n:
             break
         lower_bound += bucket_size
         cur_n += prime_count
@@ -33,4 +41,4 @@ def get_nth_prime_from_bin(n, bucket_size=10 ** 7):
 
 
 if __name__ == '__main__':
-    print(get_nth_prime(52592))
+    print(get_nth_prime_from_bin(215330, '1e6', '1e4'))

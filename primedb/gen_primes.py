@@ -108,7 +108,6 @@ def generate_prime_bucket_counts(bin_size, bucket_size, start, end):
     while m < end:
         bucket_primes = primes_from_n_to_m(n, m, initial_primes)
         count = len(bucket_primes)
-        print(n, m, count)
         prime_counts.append(count)
         n = m + 1
         m = m + bucket_size
@@ -117,4 +116,5 @@ def generate_prime_bucket_counts(bin_size, bucket_size, start, end):
 if __name__ == '__main__':
     # print(sieve(1000))
     # write_list_to_s3(range(10), ",", 'primedatabase', '0-10.txt')
-    write_nth_primes_to_s3(10 ** 6, 1000)
+    # write_nth_primes_to_s3(10 ** 6, 1000)
+    print(len(sieve(int(1e6))))
