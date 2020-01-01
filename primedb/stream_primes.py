@@ -39,7 +39,7 @@ def primes_from_n_to_m(n, m, prime_stream):
     return numpy.flatnonzero(flags) + n
 
 
-def stream_primes_from_n_to_m(n, m, batch_size):
+def stream_primes_from_n_to_m(n, m, batch_size=10**7):
     if m - n <= batch_size:
         m_root = int(m ** 0.5)
 
@@ -102,17 +102,37 @@ def generate_prime_bucket_bins(bin_size, bucket_size, start, end):
         cur_n = cur_m + 1
         cur_m = cur_n + bin_size
 
-def write_bins_to_s3(bin_size_sci, bucket_size, start, end, s3_bucket_name):
+def write_bins_to_s3(bin_size_sci, bucket_size_sci, start, end, s3_bucket_name):
     bin_size = int(float(bin_size_sci))
+    bucket_size = int(float(bucket_size_sci))
     bins = generate_prime_bucket_bins(bin_size, bucket_size, start, end)
     for cur_n, cur_m, bin in bins:
-        key_name = 'prime_counts/{}/{}.txt'.format(bin_size_sci, int(cur_m / bin_size))
+        key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, int(cur_m / bin_size))
         s3.write_list_to_s3(bin, s3_bucket_name, key_name)
         print(key_name, bin)
+
+def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name):
+    prefix = 'prime_counts/{}/{}'.format(bin_size_sci, bucket_size_sci)
+    keys = [k for k in s3.get_matching_s3_keys(s3_bucket_name, prefix)]
+    keys.sort(key=lambda k: int(k.split('/')[-1].split('.')[0]))
+    sum_total_below = 0
+    for key in keys:
+        obj = s3.client.get_object(Bucket=s3_bucket_name, Key=key)
+        total = obj['Metadata']['total']
+        total_below = obj['Metadata'].get('total_below')
+        if total_below is None:
+            kwargs = {'Bucket':s3_bucket_name, 'Key':key}
+            s3.client.copy_object(**kwargs, Metadata={
+                'total': total,
+                'total_below': str(sum_total_below)
+            }, CopySource=kwargs, MetadataDirective='REPLACE')
+        sum_total_below += int(total)
+        print(total, key)
 
 
 if __name__ == '__main__':
     # print_occasional_primes()
     # counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
     # print(counts)
-    write_bins_to_s3('1e6', 10**4, 0, 10**7, 'primedatabase')
+    # write_bins_to_s3('1e6', '1e4', 0, 10**8, 'primedatabase')
+    update_total_below_s3_metadata('1e6', '1e4', 'primedatabase')
