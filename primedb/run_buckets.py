@@ -7,6 +7,7 @@ def main():
     s3_bucket = 'primedatabase'
     start = int(float(start))
     end = int(float(end))
+    print(bin_size, bucket_size, start, end)
     write_bins_to_s3(bin_size, bucket_size, start, end, s3_bucket)
     update_total_below_s3_metadata(bin_size, bucket_size, s3_bucket)
 

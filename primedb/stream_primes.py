@@ -87,7 +87,7 @@ def generate_prime_bucket_counts(bucket_size, start, end):
     while m <= end:
         count = 0
         primes = []
-        for prime in stream_primes_from_n_to_m(n, m, 10 ** 7):
+        for prime in stream_primes_from_n_to_m(n, m, 10 ** 9):
             primes.append(prime)
             count += 1
         prime_counts.append(count)
@@ -135,5 +135,6 @@ if __name__ == '__main__':
     # print_occasional_primes()
     # counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
     # print(counts)
-    write_bins_to_s3('1e6', '1e4', 0, 1e7, 'primedatabase')
-    update_total_below_s3_metadata('1e6', '1e4', 'primedatabase')
+    print(len(list(stream_primes_from_n_to_m(0, int(1e9), int(1e8)))))
+    # write_bins_to_s3('1e9', '1e7', 0, 1e14, 'primedatabase')
+    # update_total_below_s3_metadata('1e6', '1e4', 'primedatabase')
