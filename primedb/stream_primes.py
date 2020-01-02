@@ -83,7 +83,7 @@ def generate_prime_bucket_counts(bucket_size, start, end):
     cur_bucket_end = start + bucket_size
     prime_counts = []
     count = 0
-    for prime in stream_primes_from_n_to_m(start, end, 10 ** 9):
+    for prime in stream_primes_from_n_to_m(start, end, 10 ** 8):
         if prime > cur_bucket_end:
             prime_counts.append(count)
             count = 0

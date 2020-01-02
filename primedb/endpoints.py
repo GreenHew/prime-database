@@ -31,6 +31,8 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
         key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     cur_n = total_below
+    if cur_n < 0:
+        raise Exception('Total Below metadata not set')
     lower_bound = bin_size * bin_count - bin_size
     for prime_count in counts:
         if cur_n + prime_count >= n:
@@ -42,4 +44,4 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
 
 
 if __name__ == '__main__':
-    print(get_nth_prime_from_bin(454245, '1e6', '1e4'))
+    print(get_nth_prime_from_bin(int(8e7), '1e9', '1e6'))
