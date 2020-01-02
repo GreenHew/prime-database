@@ -80,19 +80,16 @@ def print_occasional_primes():
 
 
 def generate_prime_bucket_counts(bucket_size, start, end):
-    n = start
-    m = start + bucket_size
+    cur_bucket_end = start + bucket_size
     prime_counts = []
-
-    while m <= end:
-        count = 0
-        primes = []
-        for prime in stream_primes_from_n_to_m(n, m, 10 ** 9):
-            primes.append(prime)
-            count += 1
-        prime_counts.append(count)
-        n = m
-        m = m + bucket_size
+    count = 0
+    for prime in stream_primes_from_n_to_m(start, end, 10 ** 9):
+        if prime > cur_bucket_end:
+            prime_counts.append(count)
+            count = 0
+            cur_bucket_end += bucket_size
+        count += 1
+    prime_counts.append(count)
     return prime_counts
 
 def generate_prime_bucket_bins(bin_size, bucket_size, start, end):
@@ -118,10 +115,10 @@ def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name
     keys.sort(key=lambda k: int(k.split('/')[-1].split('.')[0]))
     sum_total_below = 0
     for key in keys:
-        print(key)
         obj = s3.client.get_object(Bucket=s3_bucket_name, Key=key)
         total = obj['Metadata']['total']
         total_below = obj['Metadata'].get('total_below')
+        print(sum_total_below, key)
         if total_below is None:
             kwargs = {'Bucket':s3_bucket_name, 'Key':key}
             s3.client.copy_object(**kwargs, Metadata={
@@ -135,6 +132,6 @@ if __name__ == '__main__':
     # print_occasional_primes()
     # counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
     # print(counts)
-    print(len(list(stream_primes_from_n_to_m(0, int(1e9), int(1e8)))))
-    # write_bins_to_s3('1e9', '1e7', 0, 1e14, 'primedatabase')
-    # update_total_below_s3_metadata('1e6', '1e4', 'primedatabase')
+    # print(len(list(stream_primes_from_n_to_m(0, int(60000), 10 ** 9))))
+    write_bins_to_s3('1e6', '1e4', 0, 1e8, 'primedatabase')
+    update_total_below_s3_metadata('1e6', '1e4', 'primedatabase')
