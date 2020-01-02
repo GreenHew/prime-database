@@ -44,4 +44,4 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
 
 
 if __name__ == '__main__':
-    print(get_nth_prime_from_bin(int(8e7), '1e9', '1e6'))
+    print(get_nth_prime_from_bin(int(1e7), '1e9', '1e6'))
