@@ -25,6 +25,10 @@ def example_endpoint():
     resp, status = endpoints.example_endpoint(request.json)
     return jsonify(resp), status
 
+# TODO: get_nth_prime
+# TODO: get_prime_count_from_n_to_m
+# TODO: sequence_number_for_prime_n
+# TODO: get_primes_from_n_to_m
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',

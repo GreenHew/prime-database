@@ -22,26 +22,40 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
     bucket_size = int(float(bucket_size_sci))
     bin_size = int(float(bin_size_sci))
     upper_bound = nth_prime_upper_bound(n) + 1
+
     bin_count = upper_bound // bin_size + 1
     key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
+
     total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
-    print(key_name)
-    while n > total_below + total:
-        bin_count += 1
+
+    while n <= total_below:
+        bin_count -= 1
         key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+
     cur_n = total_below
+
     if cur_n < 0:
         raise Exception('Total Below metadata not set')
+
     lower_bound = bin_size * bin_count - bin_size
+
     for prime_count in counts:
         if cur_n + prime_count >= n:
             break
         lower_bound += bucket_size
         cur_n += prime_count
-    bucket_primes = [p for p in stream_primes_from_n_to_m(lower_bound, upper_bound)]
+
+    upper_bound = min(upper_bound, lower_bound + bucket_size)
+    bucket_primes = list(stream_primes_from_n_to_m(lower_bound, upper_bound))
+
     return bucket_primes[n - cur_n - 1]
 
 
 if __name__ == '__main__':
-    print(get_nth_prime_from_bin(int(1e7), '1e9', '1e6'))
+    # 710000000
+    # 712790800 and 712799800
+    # 712700000
+    # endish of bin 16 - 712721450
+    # startish of off by one 713732500
+    print(get_nth_prime_from_bin(int(713799800), '1e9', '1e6'))

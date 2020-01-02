@@ -45,7 +45,7 @@ def stream_primes_from_n_to_m(n, m, batch_size=10 ** 7):
 
         # If the number primes needed to generate this batch are too large, recursively stream them too
         if m_root < batch_size:
-            sub_primes = sieve(m_root)
+            sub_primes = sieve(m_root + 1)
         else:
             sub_primes = stream_primes_from_n_to_m(0, m_root, batch_size)
 
@@ -131,12 +131,12 @@ def update_total_below_s3_metadata(bin_size_sci, bucket_size_sci, s3_bucket_name
         total = obj['Metadata']['total']
         total_below = obj['Metadata'].get('total_below')
         print(sum_total_below, key)
-        if total_below is None:
-            kwargs = {'Bucket': s3_bucket_name, 'Key': key}
-            s3.client.copy_object(**kwargs, Metadata={
-                'total': total,
-                'total_below': str(sum_total_below)
-            }, CopySource=kwargs, MetadataDirective='REPLACE')
+        # if total_below is None:
+        kwargs = {'Bucket': s3_bucket_name, 'Key': key}
+        s3.client.copy_object(**kwargs, Metadata={
+            'total': total,
+            'total_below': str(sum_total_below)
+        }, CopySource=kwargs, MetadataDirective='REPLACE')
         sum_total_below += int(total)
 
 
@@ -145,5 +145,5 @@ if __name__ == '__main__':
     # counts = generate_prime_bucket_counts(10 ** 7, 10 ** 0, 10 ** 10 + 10 ** 8)
     # print(counts)
     # print(len(list(stream_primes_from_n_to_m(0, int(60000), 10 ** 9))))
-    write_bins_to_s3('1e9', '1e6', 0, 1e12, 'primedatabase')
+    # write_bins_to_s3('1e9', '1e6', int(15e9), 1e12, 'primedatabase')
     update_total_below_s3_metadata('1e9', '1e6', 'primedatabase')
