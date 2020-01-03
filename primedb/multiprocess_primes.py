@@ -19,7 +19,7 @@ def write_bins_to_s3_parallel(bin_size_sci, bucket_size_sci, start, end, s3_buck
     bucket_size = int(float(bucket_size_sci))
 
     # Don't spawn more processes than CPUs
-    max_processes = multiprocessing.cpu_count() - 1
+    max_processes = multiprocessing.cpu_count()
     print('Max processes: {}'.format(max_processes))
 
     cur_n = start
