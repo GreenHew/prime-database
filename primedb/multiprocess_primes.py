@@ -43,10 +43,10 @@ def write_bins_to_s3_parallel(bin_size_sci, bucket_size_sci, start, end, s3_buck
 
             # Remove completed processes
             processes = [p for p in processes if not p.ready()]
-
-            # If we have a lot of tasks we don't want to waste memory adding them to the queue if it is backed up
-            if len(processes) > max_processes * 2:
+            while len(processes) > max_processes * 2:
+                # If we have a lot of tasks we don't want to waste memory adding them to the queue if it is backed up
                 time.sleep(1)
+                processes = [p for p in processes if not p.ready()]
 
             cur_n = cur_m
             cur_m = cur_n + bin_size
