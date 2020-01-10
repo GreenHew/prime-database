@@ -57,6 +57,8 @@ def stream_primes_from_n_to_m(n, m, batch_size=10 ** 7):
         cur_n = n
         while cur_n < m:
             cur_m = cur_n + batch_size
+            if cur_m > m:
+                cur_m = m
             # Recursively stream primes in smaller batch sizes
             for prime in stream_primes_from_n_to_m(cur_n, cur_m, batch_size):
                 yield prime
@@ -146,4 +148,9 @@ if __name__ == '__main__':
     # print(counts)
     # print(len(list(stream_primes_from_n_to_m(0, int(60000), 10 ** 9))))
     # write_bins_to_s3('1e9', '1e6', int(15e9), 1e12, 'primedatabase')
-    update_total_below_s3_metadata('1e9', '1e6', 'primedatabase')
+    # update_total_below_s3_metadata('1e9', '1e6', 'primedatabase')
+    count = 0
+    for prime in stream_primes_from_n_to_m(int(2), int(5), 10**7):
+        count += 1
+    print(count)
+    # print(len(list(stream_primes_from_n_to_m(int(12847), int(18246812)))))
