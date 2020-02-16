@@ -52,6 +52,13 @@ class S3Controller:
             except KeyError:
                 break
 
+    def bucket_exists(self, key_name):
+        try:
+            self.load_bin_from_s3('primedatabase', key_name)
+        except:
+            return False
+        return True
+
 if __name__ == '__main__':
     ctr = S3Controller()
     print(ctr.load_bin_from_s3('primedatabase', 'prime_counts/1e6/2.txt'))
