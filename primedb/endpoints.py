@@ -56,6 +56,34 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
 
     return bucket_primes[n - cur_n - 1]
 
+def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
+    bin_size = int(float(bin_size_sci))
+    bucket_size = int(float(bucket_size_sci))
+    count = 0
+    n += 1 # make inclusive
+
+    # small range, calculate directly
+    if n < bucket_size * 2:
+        for prime in stream_primes_from_n_to_m(1, n):
+            count += 1
+        return count
+
+    cur_bin = n // bin_size
+    cur_bucket = (n - bin_size * cur_bin) // bucket_size
+    key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, cur_bin + 1)
+    total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+
+    # add prime count before bin and all buckets before n
+    count = total_below
+    for i in range(cur_bucket):
+        count += counts[i]
+
+    # count remaining primes up to n
+    if n % bucket_size > 0:
+        for prime in stream_primes_from_n_to_m(cur_bin * bin_size + cur_bucket * bucket_size, n):
+            count += 1
+    return count
+
 
 def get_prime_count_from_n_to_m(n, m, bin_size_sci, bucket_size_sci):
     bin_size = int(float(bin_size_sci))
