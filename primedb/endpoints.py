@@ -137,20 +137,37 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
     bin_size = int(float(bin_size_sci))
     bucket_size = int(float(bucket_size_sci))
 
+    # return -1 if n not a prime
+    if n % 2 == 0 or n % bin_size == 0 or n % bucket_size == 0:
+        return -1
+
+    is_prime = False
+    count = 0
+
+    # calculate small range
+    if n < bucket_size * 2:
+        for prime in stream_primes_from_n_to_m(1, n + 1):
+            count += 1
+            if prime == n:
+                is_prime = True
+        return count if is_prime else -1
+
     cur_bin = int(n // bin_size + 1)
     key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, cur_bin)
     total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
 
-    count = total_below + 1
+    count = total_below
     buckets_to_count = int((bin_size - (cur_bin * bin_size - n)) // bucket_size)
     for i in range(buckets_to_count):
         count += counts[i]
 
     # count remaining primes
     start = n - n % bucket_size
-    for prime in stream_primes_from_n_to_m(start, n):
+    for prime in stream_primes_from_n_to_m(start, n + 1):
         count += 1
-    return count
+        if prime == n:
+            is_prime = True
+    return count if is_prime else -1
 
 
 if __name__ == '__main__':
