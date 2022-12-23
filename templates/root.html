@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Primes</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<form action="#" method="post">
+<body>
+    <div class="container">
+        <div class="search-bar">
+            <div id="select">
+                <p id="selectText">nth prime number</p>
+                <img src="../static/images/arrow.png" alt="?">
+                <ul id="list">
+                    <li class="options">nth prime number</li>
+                    <li class="options">primes up to n</li>
+                    <li class="options">primes from n to m</li>
+                </ul>
+            </div>
+            <label for="inputField"></label><input type="text" id="inputField" placeholder="Search for nth prime number" name="n">
+            <button id="search-button">
+                <img src="../static/images/search.png">
+            </button>
+        </div>
+    </div>
+    <input type="hidden" id="select_id" name="select_choice" value="nth prime number" />
+
+<script>
+    let select = document.getElementById("select");
+    let list = document.getElementById("list");
+    let selectText = document.getElementById("selectText");
+    let options = document.getElementsByClassName("options");
+    let inputField = document.getElementById("inputField");
+    let selectValue = document.getElementById("select_id");
+
+    select.onclick = function () {
+        list.classList.toggle("open");
+    };
+
+    for(option of options) {
+        option.onclick = function () {
+            selectText.innerHTML = this.innerHTML;
+            inputField.placeholder = "Search for " + selectText.innerHTML;
+            selectValue.value = selectText.innerHTML
+        }
+    }
+
+</script>
+</body>
+</form>
+</html>
+
+
