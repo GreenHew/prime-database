@@ -16,12 +16,16 @@
                     <li class="options">nth prime number</li>
                     <li class="options">primes up to n</li>
                     <li class="options">primes from n to m</li>
+                    <li class="options">primality test</li>
                 </ul>
             </div>
             <label for="inputField"></label><input type="text" id="inputField" placeholder="Search for nth prime number" name="n">
             <button id="search-button">
                 <img src="../static/images/search.png">
             </button>
+        </div>
+        <div id="display">
+            <h1>{{ display }}</h1>
         </div>
     </div>
     <input type="hidden" id="select_id" name="select_choice" value="nth prime number" />

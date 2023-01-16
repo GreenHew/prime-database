@@ -14,18 +14,43 @@ if os.environ.get('USE_SSL') == 'true':
 def root():
     if request.method == 'POST':
         search_type = request.form['select_choice']
+        if search_type != 'primes from n to m':
+            try:
+                n =  request.form['n']
+                n = int(n.replace(',',''))
+            except:
+                return render_template('root.html', display="Invalid input.")
         if search_type == 'nth prime number':
-            n =  int(request.form['n'])
             nth_prime = endpoints.get_nth_prime_from_bin(n, '1e9', '1e6')
-            return render_template('nth_prime.html', index=n, prime=nth_prime)
+            if nth_prime == -1:
+                return render_template('root.html', display="Number out of range.")
+            return render_template('root.html', display=f'The {n:,} prime number is {nth_prime:,}')
         elif search_type == 'primes up to n':
-            n = int(request.form['n'])
             count = endpoints.get_prime_count_up_to_n(n, '1e9', '1e6')
-            return render_template('upto_n.html', index=n, prime=count)
+            if count == -1:
+                return render_template('root.html', display="Number out of range.")
+            return render_template('root.html', display=f'There are {count:,} prime numbers up to and including {n:,}')
+        elif search_type == 'primality test':
+            sequence_number = endpoints.get_sequence_number_for_prime_n(n, '1e9', '1e6')
+            if sequence_number == -1:
+                return render_template('root.html', display=f'{n:,} is not a prime number.')
+            if sequence_number == -2:
+                print(n)
+                return render_template('root.html', display="Number out of range.")
+            return render_template('root.html', display=f'{n:,} is the {sequence_number:,} prime.' )
         elif search_type == 'primes from n to m':
-            n = int(request.form['n'])
-            count = endpoints.get_prime_count_up_to_n(n, '1e9', '1e6')
-            return render_template('upto_n.html', index=n, prime=count)
+            text = request.form['n']
+            if ',' not in text:
+                return render_template('root.html', display="Must contain two numbers seperated by a comma. ex 123, 45678")
+            nm_range = text.split(',')
+            try:
+                n,m = int(nm_range[0]), int(nm_range[1])
+            except:
+                return render_template('root.html', display="Number out of range.")
+            count = endpoints.get_prime_count_from_n_to_m(n, m, '1e9', '1e6')
+            if count == -1:
+                return render_template('root.html', display="Number out of range.")
+            return render_template('root.html', display=f'There are {count:,} prime numbers from {n:,} to {m:,}.')
     else:
         return render_template('root.html')
 
@@ -33,11 +58,6 @@ def root():
 @app.route('/health', methods=['GET'])
 def health():
     return Response('Ok')
-
-
-def get_nth_prime(n):
-    nth_prime = endpoints.get_nth_prime(n)
-    return render_template('nth_prime.html', content=nth_prime)
 
 
 @app.route('/example_endpoint', methods=['GET', 'POST'])

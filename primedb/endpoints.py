@@ -25,12 +25,10 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
 
     bin_count = upper_bound // bin_size + 1
     key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
-    while s3.bucket_exists(key_name) is False:
-        key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
-        bin_count -= 1
-        print(key_name)
-
-    total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    try:
+        total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    except:
+        return -1 # n out of bounds
 
     while n <= total_below:
         bin_count -= 1
@@ -71,7 +69,10 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     cur_bin = n // bin_size
     cur_bucket = (n - bin_size * cur_bin) // bucket_size
     key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, cur_bin + 1)
-    total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    try:
+        total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    except:
+        return -1 # n out of range
 
     # add prime count before bin and all buckets before n
     count = total_below
@@ -134,6 +135,7 @@ def get_prime_count_from_n_to_m(n, m, bin_size_sci, bucket_size_sci):
 
 
 def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
+    # returns sequence number if prime, -1 if not a prime, or -2 if n out of range.
     bin_size = int(float(bin_size_sci))
     bucket_size = int(float(bucket_size_sci))
 
@@ -154,7 +156,10 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
 
     cur_bin = int(n // bin_size + 1)
     key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, cur_bin)
-    total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    try:
+        total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+    except:
+        return -2 # n out of range
 
     count = total_below
     buckets_to_count = int((bin_size - (cur_bin * bin_size - n)) // bucket_size)

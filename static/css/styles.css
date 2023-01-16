@@ -50,6 +50,7 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s;
+  z-index: 1000;
 }
 #select ul li{
   padding: 10px 20px;
