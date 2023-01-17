@@ -18,11 +18,10 @@ def root():
         return render_template('root.html')
 
 
-def render_template_from_input(search_type, input):
+def render_template_from_input(search_type, text_input):
     if search_type != 'primes from n to m':
         try:
-            n = request.form['n']
-            n = int(n.replace(',', ''))
+            n = int(text_input.replace(',', ''))
         except:
             return render_template('root.html', display="Invalid input.")
     if search_type == 'nth prime number':
