@@ -2,7 +2,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
 }
 
 .container{
@@ -13,6 +12,12 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  font-family: 'Helvetica', sans-serif;
+}
+#logo img{
+  width: 650px;
+  position: relative;
+  top: -250px
 }
 .search-bar{
   background: #fff;
@@ -22,6 +27,8 @@
   padding: 2px;
   border-radius: 4px;
   align-items: center;
+  position: relative;
+  top: -150px
 }
 #select{
   background: #8390FA;
@@ -82,7 +89,11 @@
   background-color: transparent;
 }
 #display{
+  width: 800px;
   position: relative;
-  top: 20px;
-  color: #fff;
+  top: -100px;
+  color: white;
+  font-size: 16px;
+  font-family: andale mono, monospace;
+  text-align: center;
 }
