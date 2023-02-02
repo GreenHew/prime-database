@@ -97,3 +97,29 @@
   font-family: andale mono, monospace;
   text-align: center;
 }
+.footer {
+  background-color: #2E294E;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  color: #fff;
+}
+.footer-links {
+  background-color: #2E294E;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+.footer-links a {
+  color: #fff;
+  margin: 0 10px;
+  text-decoration: none;
+}
+.footer-links a:hover {
+  color: #8390FA;
+}

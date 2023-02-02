@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="shortcut icon" type="image/png" href="../static/images/favicon.png"/>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Primes</title>
-    <link rel="stylesheet" href="../static/css/styles.css">
-</head>
-<form action="#" method="post">
-<body>
+    <link rel="shortcut icon" type="image/png" href="../static/images/favicon.png"/>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Primes</title>
+        <link rel="stylesheet" href="../static/css/styles.css">
+    </head>
+    <form action="#" method="post">
+    <body>
     <div class="container">
-        <div id="logo">
-            <img src="../static/images/primesfordays-logo2.png" alt="?">
-        </div>
+        <a href="https://www.primesfordays.com" id="logo">
+            <img src="../static/images/primesfordays-logo.png" alt="Logo">
+        </a>
+
+        <script>
+          document.getElementById("logo").addEventListener("click", function(event) {
+            event.preventDefault();
+            window.location.href = "http://127.0.0.1:5000/ ";
+          });
+        </script>
         <div class="search-bar">
             <div id="select">
                 <p id="selectText">{{ prev_choice }}</p>
@@ -32,6 +39,13 @@
             <h1>{{ display }}</h1>
         </div>
     </div>
+    <footer>
+      <div class="footer-links">
+        <a href="https://www.primesfordays.com/">Home</a>
+        <a href="https://www.primesfordays.com/api">API</a>
+        <a href="https://github.com/GreenHew/prime-database">GitHub</a>
+      </div>
+    </footer>
     <input type="hidden" id="select_id" name="select_choice" value="{{ prev_choice }}" />
 
 <script>

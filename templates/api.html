@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="shortcut icon" type="image/png" href="../static/images/favicon.png"/>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>API</title>
+        <link rel="stylesheet" href="../static/css/api_styles.css">
+    </head>
+    <body style="margin: 0;">
+      <div class="container">
+        <a href="https://www.primesfordays.com" id="logo">
+            <img src="../static/images/primesfordays-logo.png" alt="Logo">
+        </a>
+
+        <script>
+          document.getElementById("logo").addEventListener("click", function(event) {
+            event.preventDefault();
+            window.location.href = "http://127.0.0.1:5000/ ";
+          });
+        </script>
+
+        <div class="content">
+          <h1>API Documentation</h1>
+          <p>The primesfordays API allows users to retrieve prime numbers through GET requests.</p>
+          <h2>Endpoint</h2>
+          <code>/api/primes/{query}</code>
+          <h2>Queries</h2>
+          <ul>
+            <li>nth/{n} - returns the nth prime number</li>
+            <li>upto/{n} - returns how many prime numbers up to n</li>
+            <li>between/{n}/{m} - returns how many prime numbers between n and m</li>
+            <li>isprime/{n} - returns whether n is prime or not and its sequence number if it is prime</li>
+          </ul>
+          <h2>Example Requests</h2>
+          <code>GET /api/primes/nth/10</code><br>
+          <code>GET /api/primes/upto/20</code><br>
+          <code>GET /api/primes/between/10/30</code><br>
+          <code>GET /api/primes/isprime/29</code>
+        </div>
+    </div>
+    <footer>
+      <div class="footer-links">
+        <a href="https://www.primesfordays.com/">Home</a>
+        <a href="https://www.primesfordays.com/api">API</a>
+        <a href="https://github.com/GreenHew/prime-database">GitHub</a>
+      </div>
+    </footer>
+</body>
+</html>

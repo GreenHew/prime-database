@@ -3,7 +3,7 @@ from flask import Flask, Response, request, jsonify, redirect, url_for, render_t
 from flask_sslify import SSLify
 import os
 
-app = Flask(__name__, template_folder='templates', static_url_path='/static')
+app = Flask(__name__, template_folder='templates', static_url_path='/static', subdomain_matching=True)
 application = app
 
 if os.environ.get('USE_SSL') == 'true':
@@ -38,27 +38,30 @@ def render_template_from_input(search_type, text_input):
 
 
 def nth_prime_template(n, search_type):
-    nth_prime = endpoints.get_nth_prime_from_bin(n, '1e9', '1e6')
-    if nth_prime == -1:
+    resp, status = endpoints.get_nth_prime_from_bin(n, '1e9', '1e6')
+    if status == 404:
         return render_template('root.html', display="Number out of range", prev_choice=search_type)
+    nth_prime = resp['nth_prime']
     return render_template('root.html', display=f'The {n:,} prime number is {nth_prime:,}', prev_choice=search_type)
 
 
 def pi_n_template(n, search_type):
-    count = endpoints.get_prime_count_up_to_n(n, '1e9', '1e6')
-    if count == -1:
+    resp, status = endpoints.get_prime_count_up_to_n(n, '1e9', '1e6')
+    if status == 404:
         return render_template('root.html', display="Number out of range", prev_choice=search_type)
+    count = resp['count']
     return render_template('root.html', display=f'There are {count:,} prime numbers up to and including {n:,}', prev_choice=search_type)
 
 
 def primality_template(n, search_type):
-    sequence_number = endpoints.get_sequence_number_for_prime_n(n, '1e9', '1e6')
-    if sequence_number == -1:
-        return render_template('root.html', display=f'{n:,} is not a prime number', prev_choice=search_type)
-    if sequence_number == -2:
-        print(n)
+    resp, status = endpoints.get_sequence_number_for_prime_n(n, '1e9', '1e6')
+    if status == 404:
         return render_template('root.html', display="Number out of range", prev_choice=search_type)
-    return render_template('root.html', display=f'{n:,} is the {sequence_number:,} prime', prev_choice=search_type)
+    is_prime = resp['is_prime']
+    if is_prime:
+        sequence_number = resp['sequence_number']
+        return render_template('root.html', display=f'{n:,} is the {sequence_number:,} prime', prev_choice=search_type)
+    return render_template('root.html', display=f'{n:,} is not a prime number', prev_choice=search_type)
 
 
 def primes_from_n_to_m_template(text, search_type):
@@ -67,9 +70,10 @@ def primes_from_n_to_m_template(text, search_type):
         n, m = int(nm_range[0]), int(nm_range[1])
     except:
         return render_template('root.html', display="Number out of range.", prev_choice=search_type)
-    count = endpoints.get_prime_count_from_n_to_m(n, m, '1e9', '1e6')
-    if count == -1:
+    resp, status = endpoints.get_prime_count_from_n_to_m(n, m, '1e9', '1e6')
+    if status == 404:
         return render_template('root.html', display="Number out of range.", prev_choice=search_type)
+    count = resp['count']
     return render_template('root.html', display=f'There are {count:,} prime numbers from {n:,} to {m:,}', prev_choice=search_type)
 
 
@@ -78,15 +82,34 @@ def health():
     return Response('Ok')
 
 
-@app.route('/example_endpoint', methods=['GET', 'POST'])
-def example_endpoint():
-    resp, status = endpoints.example_endpoint(request.json)
+@app.route('/api', methods=['GET'])
+def api():
+    return render_template('api.html')
+
+
+@app.route('/api/primes/nth/<int:n>/', methods=['GET'])
+def get_nth_prime(n):
+    resp, status = endpoints.get_nth_prime_from_bin(n, '1e9', '1e6')
     return jsonify(resp), status
 
-# TODO: get_nth_prime
-# TODO: get_prime_count_from_n_to_m
-# TODO: sequence_number_for_prime_n
-# TODO: get_primes_from_n_to_m
+
+@app.route('/api/primes/upto/<int:n>/', methods=['GET'])
+def get_primes_upto_n(n):
+    resp, status = endpoints.get_prime_count_up_to_n(n, '1e9', '1e6')
+    return jsonify(resp), status
+
+
+@app.route('/api/primes/between/<int:n>/<int:m>', methods=['GET'])
+def get_primes_from_n_to_m(n, m):
+    resp, status = endpoints.get_prime_count_from_n_to_m(n, m, '1e9', '1e6')
+    return jsonify(resp), status
+
+
+@app.route('/api/primes/isprime/<int:n>/', methods=['GET'])
+def get_sequence_number_for_prime(n):
+    resp, status = endpoints.get_sequence_number_for_prime_n(n, '1e9', '1e6')
+    return jsonify(resp), status
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',
