@@ -7,73 +7,73 @@
         <link rel="stylesheet" href="../static/css/styles.css">
     </head>
     <form action="#" method="post">
-    <body>
-    <div class="container">
-        <a href="https://www.primesfordays.com" id="logo">
-            <img src="../static/images/primesfordays-logo.png" alt="Logo">
-        </a>
+        <body>
+            <div class="container">
+                <a href="https://www.primesfordays.com" id="logo">
+                    <img src="../static/images/primesfordays-logo.png" alt="Logo">
+                </a>
 
-        <script>
-          document.getElementById("logo").addEventListener("click", function(event) {
-            event.preventDefault();
-            window.location.href = "http://127.0.0.1:5000/ ";
-          });
-        </script>
-        <div class="search-bar">
-            <div id="select">
-                <p id="selectText">{{ prev_choice }}</p>
-                <img src="../static/images/arrow.png" alt="?">
-                <ul id="list">
-                    <li class="options">nth prime number</li>
-                    <li class="options">primes up to n</li>
-                    <li class="options">primes from n to m</li>
-                    <li class="options">primality test</li>
-                </ul>
+                <script>
+                  document.getElementById("logo").addEventListener("click", function(event) {
+                    event.preventDefault();
+                    window.location.href = "https://www.primesfordays.com";
+                  });
+                </script>
+                <div class="search-bar">
+                    <div id="select">
+                        <p id="selectText">{{ prev_choice }}</p>
+                        <img src="../static/images/arrow.png" alt="?">
+                        <ul id="list">
+                            <li class="options">nth prime number</li>
+                            <li class="options">primes up to n</li>
+                            <li class="options">primes from n to m</li>
+                            <li class="options">primality test</li>
+                        </ul>
+                    </div>
+                    <label for="inputField"></label><input type="text" id="inputField" placeholder="Search for {{ prev_choice }}" name="n">
+                    <button id="search-button">
+                        <img src="../static/images/search.png">
+                    </button>
+                </div>
+                <div id="display">
+                    <h1>{{ display }}</h1>
+                </div>
             </div>
-            <label for="inputField"></label><input type="text" id="inputField" placeholder="Search for {{ prev_choice }}" name="n">
-            <button id="search-button">
-                <img src="../static/images/search.png">
-            </button>
-        </div>
-        <div id="display">
-            <h1>{{ display }}</h1>
-        </div>
-    </div>
-    <footer>
-      <div class="footer-links">
-        <a href="https://www.primesfordays.com/">Home</a>
-        <a href="https://www.primesfordays.com/api">API</a>
-        <a href="https://github.com/GreenHew/prime-database">GitHub</a>
-      </div>
-    </footer>
-    <input type="hidden" id="select_id" name="select_choice" value="{{ prev_choice }}" />
+        <footer>
+          <div class="footer-links">
+            <a href="https://www.primesfordays.com/">Home</a>
+            <a href="https://www.primesfordays.com/api">API</a>
+            <a href="https://github.com/GreenHew/prime-database">GitHub</a>
+          </div>
+        </footer>
+        <input type="hidden" id="select_id" name="select_choice" value="{{ prev_choice }}" />
 
-<script>
-    let select = document.getElementById("select");
-    let list = document.getElementById("list");
-    let selectText = document.getElementById("selectText");
-    let options = document.getElementsByClassName("options");
-    let inputField = document.getElementById("inputField");
-    let selectValue = document.getElementById("select_id");
+            <script>
+                let select = document.getElementById("select");
+                let list = document.getElementById("list");
+                let selectText = document.getElementById("selectText");
+                let options = document.getElementsByClassName("options");
+                let inputField = document.getElementById("inputField");
+                let selectValue = document.getElementById("select_id");
 
-    select.onclick = function () {
-        list.classList.toggle("open");
-    };
+                select.onclick = function () {
+                    list.classList.toggle("open");
+                };
 
-    for(option of options) {
-        option.onclick = function () {
-            selectText.innerHTML = this.innerHTML;
-            inputField.placeholder = "Search for " + selectText.innerHTML;
-            if (selectText.innerHTML == "primes from n to m"){
-                inputField.placeholder += " in form n, m"
-            }
-            selectValue.value = selectText.innerHTML
-        }
-    }
+                for(option of options) {
+                    option.onclick = function () {
+                        selectText.innerHTML = this.innerHTML;
+                        inputField.placeholder = "Search for " + selectText.innerHTML;
+                        if (selectText.innerHTML == "primes from n to m"){
+                            inputField.placeholder += " in form n, m"
+                        }
+                        selectValue.value = selectText.innerHTML
+                    }
+                }
 
-</script>
-</body>
-</form>
+            </script>
+        </body>
+    </form>
 </html>
 
 

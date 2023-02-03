@@ -1,17 +1,13 @@
-.container{
+.container {
   background: #2E294E;
   width: 100%;
+  height: auto;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   font-family: 'Helvetica', sans-serif;
-}
-container::after{
-  content: '';
-  display: block;
-  height: 50px; /* Set same as footer's height */
 }
 #logo img{
   width: 650px;
@@ -49,10 +45,13 @@ ul{
   justify-content: space-between;
   padding: 20px;
   color: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 .footer-links {
   background-color: #2E294E;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   display: flex;
@@ -67,4 +66,23 @@ ul{
 }
 .footer-links a:hover {
   color: #8390FA;
+}
+@media (max-width: 767px) {
+  .container {
+    height: auto;
+    min-height: 100%;
+    position: relative;
+  }
+  #logo img {
+    width: 85%;
+    position: relative;
+    top: 0;
+    padding: 20px;
+  }
+  .content {
+    width: 100%;
+    padding: 0px 0px 80px;
+    position: relative;
+    top: 0;
+  }
 }

@@ -15,9 +15,20 @@
   font-family: 'Helvetica', sans-serif;
 }
 #logo img{
-  width: 650px;
+  max-width: 650px;
   position: relative;
   top: -250px
+}
+@media (max-width: 767px) {
+  #logo img{
+    width: 300px;
+    top: -200px;
+  }
+  .search-bar{
+    top: 0;
+    width: 100%;
+    max-width: none;
+  }
 }
 .search-bar{
   background: #fff;
@@ -37,7 +48,7 @@
   justify-content: space-between;
   color: #fff;
   width: 400px;
-  padding: 25px 20px;
+  padding: 20px 20px;
   cursor: pointer;
   position: relative;
   border-radius: 4px;
@@ -85,17 +96,18 @@
   border-color: transparent;
 }
 #search-button img{
-  width: 35px;
+  height: 30px;
   background-color: transparent;
 }
 #display{
-  width: 800px;
+  max-width: 800px;
   position: relative;
   top: -100px;
   color: white;
   font-size: 16px;
   font-family: andale mono, monospace;
   text-align: center;
+  padding: 10px;
 }
 .footer {
   background-color: #2E294E;
