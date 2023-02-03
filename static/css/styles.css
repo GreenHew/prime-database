@@ -116,10 +116,13 @@
   justify-content: space-between;
   padding: 20px;
   color: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 .footer-links {
   background-color: #2E294E;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   display: flex;
