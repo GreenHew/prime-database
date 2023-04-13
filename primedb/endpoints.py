@@ -81,7 +81,7 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
 
     # count remaining primes up to n
     if n % bucket_size > 0:
-        for prime in stream_primes_from_n_to_m(cur_bin * bin_size + cur_bucket * bucket_size, n):
+        for _ in stream_primes_from_n_to_m(cur_bin * bin_size + cur_bucket * bucket_size, n):
             count += 1
     return count
 
