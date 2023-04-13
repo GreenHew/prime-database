@@ -28,12 +28,14 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
     try:
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     except:
-        return -1 # n out of bounds
+        return {'message': 'out of range'}, 404
 
     while n <= total_below:
         bin_count -= 1
         key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, bin_count)
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
+
+    # print(key_name)
 
     cur_n = total_below
 
@@ -52,7 +54,7 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
     bucket_primes = list(stream_primes_from_n_to_m(lower_bound, upper_bound))
     print(n - cur_n - 1, len(bucket_primes), total + total_below)
 
-    return bucket_primes[n - cur_n - 1]
+    return {'nth_prime': int(bucket_primes[n - cur_n - 1])}, 200
 
 def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     bin_size = int(float(bin_size_sci))
@@ -64,7 +66,7 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     if n < bucket_size * 2:
         for prime in stream_primes_from_n_to_m(1, n):
             count += 1
-        return count
+        return {'count': count}, 200
 
     cur_bin = n // bin_size
     cur_bucket = (n - bin_size * cur_bin) // bucket_size
@@ -72,7 +74,7 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     try:
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     except:
-        return -1 # n out of range
+        return {'message': 'out of range'}, 404
 
     # add prime count before bin and all buckets before n
     count = total_below
@@ -83,56 +85,18 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     if n % bucket_size > 0:
         for _ in stream_primes_from_n_to_m(cur_bin * bin_size + cur_bucket * bucket_size, n):
             count += 1
-    return count
-
+    return {'count': count}, 200
 
 def get_prime_count_from_n_to_m(n, m, bin_size_sci, bucket_size_sci):
-    bin_size = int(float(bin_size_sci))
-    bucket_size = int(float(bucket_size_sci))
-    count = 0
-
-    # small range, calculate directly
-    if m - n < bucket_size * 2:
-        for prime in stream_primes_from_n_to_m(n, m):
-            count += 1
-        return count
-
-    first_bin = n // bin_size + 1
-    last_bin = m // bin_size
-    cur_m = n
-    if m % bin_size > 0:
-        last_bin += 1
-    cur_bucket = (n - bin_size * (first_bin - 1)) // bucket_size
-
-    if n % bucket_size > 0:
-        cur_bucket += 1
-        # count primes upto the first bucket
-        cur_m = cur_bucket * bucket_size
-        for prime in stream_primes_from_n_to_m(n, cur_m):
-            count += 1
-
-    # load prime counts from s3 and count buckets
-    key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, first_bin)
-    first_total_below, first_total, first_counts = s3.load_bin_from_s3('primedatabase', key_name)
-    key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, last_bin)
-    last_total_below, last_total, last_counts = s3.load_bin_from_s3('primedatabase', key_name)
-    count += last_total_below - first_total_below
-    cur_bucket = 0
-    while m > (cur_bucket + 1) * bucket_size + bin_size * (last_bin - 1) and cur_bucket < len(last_counts):
-        count += last_counts[cur_bucket]
-        cur_bucket += 1
-
-    # subtract off the primes from start of first bin to n
-    if n % bin_size > 0:
-        count -= get_prime_count_from_n_to_m(n - n % bin_size, cur_m, bin_size_sci, bucket_size_sci)
-
-    # count the remaining primes
-    if m % bucket_size > 0:
-        cur_n = m - m % bucket_size
-        for prime in stream_primes_from_n_to_m(cur_n, m, 10 ** 9):
-            count += 1
-    return count
-
+    if m < n:
+        return {'message': 'out of range'}, 404
+    if n <= 2:
+        return get_prime_count_up_to_n(m, bin_size_sci, bucket_size_sci)
+    n_resp, n_status = get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci)
+    m_resp, m_status = get_prime_count_up_to_n(m, bin_size_sci, bucket_size_sci)
+    if n_status == 404 or m_status == 404:
+        return {'message': 'out of range'}, 404
+    return {'count': m_resp['count'] - n_resp['count']}, 200
 
 def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
     # returns sequence number if prime, -1 if not a prime, or -2 if n out of range.
@@ -141,7 +105,7 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
 
     # return -1 if n not a prime
     if n % 2 == 0 or n % bin_size == 0 or n % bucket_size == 0:
-        return -1
+        return {'is_prime': False}, 200
 
     is_prime = False
     count = 0
@@ -152,14 +116,19 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
             count += 1
             if prime == n:
                 is_prime = True
-        return count if is_prime else -1
+        if is_prime:
+            return {'is_prime': True,
+                    'sequence_number': count
+                    }, 200
+        else:
+            return {'is_prime': False}, 200
 
     cur_bin = int(n // bin_size + 1)
     key_name = 'prime_counts/{}/{}/{}.txt'.format(bin_size_sci, bucket_size_sci, cur_bin)
     try:
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     except:
-        return -2 # n out of range
+        return {'message': 'out of range'}, 404
 
     count = total_below
     buckets_to_count = int((bin_size - (cur_bin * bin_size - n)) // bucket_size)
@@ -172,7 +141,14 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
         count += 1
         if prime == n:
             is_prime = True
-    return count if is_prime else -1
+    if is_prime:
+        return {'is_prime': True,
+                'sequence_number': count
+                }, 200
+    else:
+        return {'is_prime': False}, 200
+
+
 
 
 if __name__ == '__main__':
@@ -182,8 +158,9 @@ if __name__ == '__main__':
     # endish of bin 16 - 712721450
     # startish of off by one 713732500
 
-    print(get_nth_prime_from_bin(int(322346446323), '1e9', '1e6'))
-    # print(get_prime_count_from_n_to_m(int(0), int(1e14), '1e9', '1e6'))
-    # print(get_sequence_number_for_prime_n(int(2), '1e9', '1e6'))
+    # print(get_nth_prime_from_bin(int(3.2*10**12), '1e9', '1e6'))
+    # print(get_prime_count_from_n_to_m(12345,  100, '1e9', '1e6'))
+    # print(get_prime_count_up_to_n(9*10**13, '1e9', '1e6'))
+    print(get_sequence_number_for_prime_n(4983906313, '1e9', '1e6'))
 
     # 23,365
