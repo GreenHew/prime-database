@@ -39,24 +39,24 @@ def render_template_from_input(search_type, text_input):
 
 def nth_prime_template(n, search_type):
     resp, status = endpoints.get_nth_prime_from_bin(n, '1e9', '1e6')
-    if status == 404:
-        return render_template('root.html', display="Number out of range", prev_choice=search_type)
+    if status != 200:
+        return render_template('root.html', display=f"{resp['message']}", prev_choice=search_type)
     nth_prime = resp['nth_prime']
     return render_template('root.html', display=f'The {n:,} prime number is {nth_prime:,}', prev_choice=search_type)
 
 
 def pi_n_template(n, search_type):
     resp, status = endpoints.get_prime_count_up_to_n(n, '1e9', '1e6')
-    if status == 404:
-        return render_template('root.html', display="Number out of range", prev_choice=search_type)
+    if status != 200:
+        return render_template('root.html', display=f"{resp['message']}", prev_choice=search_type)
     count = resp['count']
     return render_template('root.html', display=f'There are {count:,} prime numbers up to and including {n:,}', prev_choice=search_type)
 
 
 def primality_template(n, search_type):
     resp, status = endpoints.get_sequence_number_for_prime_n(n, '1e9', '1e6')
-    if status == 404:
-        return render_template('root.html', display="Number out of range", prev_choice=search_type)
+    if status != 200:
+        return render_template('root.html', display=f"{resp['message']}", prev_choice=search_type)
     is_prime = resp['is_prime']
     if is_prime:
         sequence_number = resp['sequence_number']
@@ -69,10 +69,10 @@ def primes_from_n_to_m_template(text, search_type):
     try:
         n, m = int(nm_range[0]), int(nm_range[1])
     except:
-        return render_template('root.html', display="Number out of range.", prev_choice=search_type)
+        return render_template('root.html', display="Invalid input", prev_choice=search_type)
     resp, status = endpoints.get_prime_count_from_n_to_m(n, m, '1e9', '1e6')
-    if status == 404:
-        return render_template('root.html', display="Number out of range.", prev_choice=search_type)
+    if status != 200:
+        return render_template('root.html', display=f"{resp['message']}", prev_choice=search_type)
     count = resp['count']
     return render_template('root.html', display=f'There are {count:,} prime numbers from {n:,} to {m:,}', prev_choice=search_type)
 

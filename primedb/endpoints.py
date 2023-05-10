@@ -19,6 +19,8 @@ def get_nth_prime(n, bucket_size=1000):
 
 
 def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
+    if n <= 0:
+        return {'message': 'Input must be greater than 0'}, 422
     bucket_size = int(float(bucket_size_sci))
     bin_size = int(float(bin_size_sci))
     upper_bound = nth_prime_upper_bound(n) + 1
@@ -28,7 +30,7 @@ def get_nth_prime_from_bin(n, bin_size_sci, bucket_size_sci):
     try:
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     except:
-        return {'message': 'out of range'}, 404
+        return {'message': 'Input out of range'}, 422
 
     while n <= total_below:
         bin_count -= 1
@@ -63,9 +65,10 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     n += 1 # make inclusive
 
     # small range, calculate directly
-    if n < bucket_size * 2:
-        for prime in stream_primes_from_n_to_m(1, n):
-            count += 1
+    if n < bucket_size:
+        if n > 0:
+            for prime in stream_primes_from_n_to_m(1, n):
+                count += 1
         return {'count': count}, 200
 
     cur_bin = n // bin_size
@@ -74,7 +77,7 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
     try:
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     except:
-        return {'message': 'out of range'}, 404
+        return {'message': 'Input out of range'}, 422
 
     # add prime count before bin and all buckets before n
     count = total_below
@@ -89,13 +92,13 @@ def get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci):
 
 def get_prime_count_from_n_to_m(n, m, bin_size_sci, bucket_size_sci):
     if m < n:
-        return {'message': 'out of range'}, 404
+        return {'message': 'Invalid range'}, 422
     if n <= 2:
         return get_prime_count_up_to_n(m, bin_size_sci, bucket_size_sci)
     n_resp, n_status = get_prime_count_up_to_n(n, bin_size_sci, bucket_size_sci)
     m_resp, m_status = get_prime_count_up_to_n(m, bin_size_sci, bucket_size_sci)
-    if n_status == 404 or m_status == 404:
-        return {'message': 'out of range'}, 404
+    if n_status == 422 or m_status == 422:
+        return {'message': 'Input out of range'}, 422
     return {'count': m_resp['count'] - n_resp['count']}, 200
 
 def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
@@ -111,7 +114,7 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
     count = 0
 
     # calculate small range
-    if n < bucket_size * 2:
+    if n < bucket_size:
         for prime in stream_primes_from_n_to_m(1, n + 1):
             count += 1
             if prime == n:
@@ -128,7 +131,7 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
     try:
         total_below, total, counts = s3.load_bin_from_s3('primedatabase', key_name)
     except:
-        return {'message': 'out of range'}, 404
+        return {'message': 'Input out of range'}, 422
 
     count = total_below
     buckets_to_count = int((bin_size - (cur_bin * bin_size - n)) // bucket_size)
