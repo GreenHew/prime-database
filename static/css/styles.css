@@ -14,15 +14,22 @@
   flex-direction: column;
   font-family: 'Helvetica', sans-serif;
 }
-#logo img{
+#logo {
   max-width: 650px;
   position: relative;
   top: -250px
 }
+#logo img{
+  max-width: 650px;
+  position: relative;
+}
 @media (max-width: 767px) {
-  #logo img{
+  #logo {
     width: 300px;
     top: -200px;
+  }
+  #logo img{
+    width: 300px;
   }
   .search-bar{
     top: 0;
