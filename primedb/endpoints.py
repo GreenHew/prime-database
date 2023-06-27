@@ -106,8 +106,7 @@ def get_sequence_number_for_prime_n(n, bin_size_sci, bucket_size_sci):
     bin_size = int(float(bin_size_sci))
     bucket_size = int(float(bucket_size_sci))
 
-    # return -1 if n not a prime
-    if n % 2 == 0 or n % bin_size == 0 or n % bucket_size == 0:
+    if n % bin_size == 0 or n % bucket_size == 0:
         return {'is_prime': False}, 200
 
     is_prime = False
@@ -164,6 +163,6 @@ if __name__ == '__main__':
     # print(get_nth_prime_from_bin(int(3.2*10**12), '1e9', '1e6'))
     # print(get_prime_count_from_n_to_m(12345,  100, '1e9', '1e6'))
     # print(get_prime_count_up_to_n(9*10**13, '1e9', '1e6'))
-    print(get_sequence_number_for_prime_n(4983906313, '1e9', '1e6'))
+    print(get_sequence_number_for_prime_n(2, '1e9', '1e6'))
 
     # 23,365
